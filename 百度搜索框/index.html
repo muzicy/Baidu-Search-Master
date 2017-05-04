@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>百度搜索框</title>
+  <script rel="stylesheet" type='text/javascript' src="jquery3.js"></script>
+  <style>
+
+  * {
+  	margin: 0;
+  	padding: 0;
+  }
+    #container {
+    	width: 400px;
+    	margin: 0 auto;
+    }
+
+    input {
+    	display: inline-block;
+    	width: 300px;
+    	height: 40px;
+    	border-radius: 8px;
+    }
+
+    ul {
+    	width: 300px;    	
+    }
+
+    li {
+    	display: block;
+    	text-decoration: none;
+    	border-bottom: 1px solid #ccc;
+    }
+
+    li:last-child {
+       background-color: yellow;
+    }
+
+    li:hover {
+    	background-color: green;
+    	cursor: pointer;
+    }
+
+  </style>
+
+  <script>
+
+$(document).ready(function() {
+var oInput = document.getElementsByTagName('input')[0];
+var oBtn = document.getElementsByTagName('button')[0];
+    
+var oUl = document.getElementsByTagName('ul')[0];
+
+var addEventCompact = function(elem, type, handler) {
+
+    	if(document.addEventListener) {
+    		addEventCompact = elem.addEventListener(type, handler, false);
+     	} else if(document.attachEvent) {
+     		addEventCompact = elem.attachEvent('on' + type, handler);
+     	} else {
+     		elem['on'+type] = handler;
+     	}
+};
+
+
+    var removeEvent = function(elem, type, handler) {
+
+    	if(document.removeEventListener) {
+    		removeEvent = elem.removeEventListener(type, handler, false);
+    	} else if(document.detachEvent) {
+    		removeEvent = elem.detachEvent('on'+type, handler);
+    	} else {
+    		elem['on'+type] = null;
+    	}
+    };
+    
+   var handler1 = function() {
+   	   var i, len,
+   	       oli;
+       
+       if(oUl.children.length) {
+          oUl.innerHTML = '';               	 
+       }
+
+       var text = oInput.value;       
+
+       if(text.trim().length !== 0) {
+
+           $.post('http://localhost:3000/search', {data: text}).then(function(res) {      
+              
+	       	   var i, len = res.length;
+	       	   var oFragment = document.createDocumentFragment();
+               var contains = JSON.parse(res);
+
+		   	   for(i = 0, len = contains.length; i < len; i++) {
+		   	   	  // console.log(text);
+
+		   	   	   if(contains[i].search(text.trim()) !== -1) {
+		               oli = document.createElement('li');
+		               oli.innerHTML = contains[i];
+		               oFragment.appendChild(oli);
+		   	   	   }
+		   	   }  
+		   	   oUl.appendChild(oFragment);
+		   	   oBtn.disable = true;
+	       })
+	   
+       }       
+   };
+
+   var handler2 = function(event) {
+      
+      var event = event || window.event;
+      var src = event.target || event.srcElement;
+
+
+      if(src.nodeName.toLowerCase() == 'li') {          
+         
+          oInput.value = src.innerHTML;
+          
+      }
+   }; 
+  
+   var handler3 = function(event) {
+
+   	  var event = event || window.event;
+     
+   	  if( event.keyCode == 13 ) {
+   	  	 handler1();
+   	  }
+   }
+
+
+   oUl.addEventListener('click', function(event) {
+   	  handler2(event);
+   },false);
+
+   addEventCompact(oBtn, 'click', handler1);
+   
+  document.addEventListener('keydown', function(event) {
+  	 handler3(event);
+  },false);
+
+})
+
+
+</script>
+</head>
+
+<body>
+
+    <div id='container'>       
+        <input type="text" placeholder='请输入关键词'>
+        <button>搜索</button>
+        <ul></ul>
+    </div>
+
+</body>
+
+
+</html>

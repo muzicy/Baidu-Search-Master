@@ -1,0 +1,10 @@
+{
+  "name": "like baidu search",
+  "version": "0.0.1",
+  "description": "this is a search bar just like baidu",
+  "dependencies": {
+    "compression": "^1.6.2",
+    "connect": "1.8.7",
+    "morgan": "^1.8.1"
+  }
+}
